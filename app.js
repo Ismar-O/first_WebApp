@@ -1,10 +1,20 @@
-const { time } = require('console');
+
 const express = require('express');  
-const path = require('path');  
-const bodyParser = require('body-parser');   
 const app = express();
+var cookieParser = require('cookie-parser');   //Parsing cookies
+app.use(cookieParser());
+const path = require('path');                 //For joining paths
+
+
+
+/****************************************** */
+
+app.use(express.json());
+
 const port = 8000;    
 const { MongoClient } = require("mongodb"); 
+
+
 
 console.log(Date());
 
@@ -17,24 +27,39 @@ const uri = "mongodb+srv://ismarosmanovic04:hCprY70OQEnq3yod@ismardb.s36za.mongo
 const client = new MongoClient(uri); 
 
 
+app.use(express.static(path.join(__dirname, '/public')))
+//app.use(express.static(path.join(__dirname, '/public/js'))); Nije potrebno 
+//app.use(express.static(path.join(__dirname, '/public/css')));
+app.use(express.static(path.join(__dirname, '/public/images')));
 
-app.use(bodyParser.urlencoded({ extended: true }));     
+app.get('/', (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+})
 
 app.post('/newpost', (req, res) => {
-    const Text = "Novi"//req.body.myText;  
-    const Head = "Novi"//req.body.myHead;
-    const User = "Post"//req.body.myUser
   
-    console.log("Post received");
+    console.log('REdirectam');
+    console.log(req.cookies); 
+    
   
+   
+    res.cookie('rememberme', '1', { expires: new Date(Date.now() + 90000000000), httpOnly: true, sameSite: 'None', secure: 'false'})
+
+    res.redirect('/redirect');
+
+    
   
-  
-    const myobj = {Head: Head, Text: Text, User: User }; 
-    pageWrite("post", myobj);  
-  
-    // Send a response back to the client to confirm success
-    res.json({ message: "Post successful", data: myobj });
+    
   });
+
+
+  app.get('/redirect', (req, res) =>{
+    res.sendFile(path.join(__dirname, 'public', 'red.html'));
+    
+  })
+
+
+
 
 
   //Writing to base

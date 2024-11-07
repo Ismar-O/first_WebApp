@@ -1,0 +1,7 @@
+
+
+#myId {
+    transition: transform 2s ease-in-out; /* Smooth transition for transform */
+    background-color: aqua;
+    text-align: center;
+  }
