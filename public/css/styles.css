@@ -5,3 +5,26 @@
     background-color: aqua;
     text-align: center;
   }
+
+
+  #myId2 {
+    transition: transform 2s ease-in-out; /* Smooth transition for transform */
+    background-color: purple;
+    text-align: center;
+  }
+
+#novaFoo{
+  padding: 20px;
+  background-color: yellow;
+  width: 20%;
+  text-align: center;
+  margin-top: 20px;
+
+}
+
+.my-class{
+
+
+  background-color: rebeccapurple;
+
+}

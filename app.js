@@ -5,6 +5,9 @@ var cookieParser = require('cookie-parser');   //Parsing cookies
 app.use(cookieParser());
 const path = require('path');                 //For joining paths
 
+app.set('view engine', 'pug');
+
+
 
 
 /****************************************** */
@@ -36,14 +39,16 @@ app.get('/', (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 })
 
+
+
 app.post('/newpost', (req, res) => {
   
-    console.log('REdirectam');
+    console.log('Redirectam');
     console.log(req.cookies); 
     
   
    
-    res.cookie('rememberme', '1', { expires: new Date(Date.now() + 90000000000), httpOnly: true, sameSite: 'None', secure: 'false'})
+    res.cookie('rememberme', '1', { expires: new Date(Date.now() + 36000000), httpOnly: true, sameSite: 'None', secure: 'false'})
 
     res.redirect('/redirect');
 
@@ -54,10 +59,24 @@ app.post('/newpost', (req, res) => {
 
 
   app.get('/redirect', (req, res) =>{
-    res.sendFile(path.join(__dirname, 'public', 'red.html'));
+   
+     res.sendFile(path.join(__dirname, 'public', 'red.html'));
     
   })
 
+  app.post('/redirect', (req,res)=>{
+    res.redirect('/getred');
+    console.log(req.body);
+    res.end();
+
+  })
+
+  app.get('/getred', (req,res) =>{
+
+    res.render('test', { title: 'Hey', message: 'Hello there!', paragraph: 'Ismar Osmanovic Ismar Osmanovic Ismar Osmanovic' })
+
+
+  })
 
 
 

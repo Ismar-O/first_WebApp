@@ -8,7 +8,7 @@ document.getElementById('myForm').addEventListener('submit', async function(e) {
      };
 
     try {
-      const response = await fetch('http://localhost:8000/newpost', {
+      const response = await fetch('/newpost', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
