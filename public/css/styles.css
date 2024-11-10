@@ -1,4 +1,9 @@
 
+#myForm input{
+  display: block;
+  margin: 10px;
+}
+
 
 #myId {
     transition: transform 2s ease-in-out; /* Smooth transition for transform */

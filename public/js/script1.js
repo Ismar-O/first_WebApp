@@ -46,3 +46,32 @@ document.getElementById('novaFoo').addEventListener('click',async function(foo) 
 
 
 })
+
+
+
+
+
+document.getElementById('routerFoo').addEventListener('click',async function(foo) {
+
+  let data = {
+    dataOdKlijenta1: 'primjer 1',
+    dataOdKlijenta2: 'primjer 2',
+  };
+  foo.preventDefault();
+  const response = await fetch('/redirect/routerred', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+
+  });
+  if (response.redirected) {
+    window.location.href = response.url; // Redirect to the URL specified in the response
+  }
+    const result = await response.json();
+    console.log(result);
+    //console.log('Response:', result);
+
+
+})

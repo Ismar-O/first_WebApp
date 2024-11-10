@@ -4,7 +4,9 @@ document.getElementById('myForm').addEventListener('submit', async function(e) {
     const formData = new FormData(this);
     
     const data = {
-      mojText: formData.get('mojText'),
+      name: formData.get('name'),
+      pw: formData.get('pw'),
+      email: formData.get('email')
      };
 
     try {

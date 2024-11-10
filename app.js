@@ -3,10 +3,13 @@ const express = require('express');
 const app = express();
 var cookieParser = require('cookie-parser');   //Parsing cookies
 app.use(cookieParser());
-const path = require('path');                 //For joining paths
+const path = require('path');  
 
 app.set('view engine', 'pug');
 
+const routers = require('./routers');    //ubacivanje ruta iz routes.js
+const {pageWrite, pageRead} = require('./mongoDBfunctions'); //ubacivanje funkcija za pisanje po bazi iz mongoDBfunctions
+app.use('/redirect', routers);
 
 
 
@@ -14,8 +17,7 @@ app.set('view engine', 'pug');
 
 app.use(express.json());
 
-const port = 8000;    
-const { MongoClient } = require("mongodb"); 
+const port = 8000;   
 
 
 
@@ -26,8 +28,9 @@ app.listen(port, '0.0.0.0', () => {
     console.log('Server running on port 8000');
 });
 
-const uri = "mongodb+srv://ismarosmanovic04:hCprY70OQEnq3yod@ismardb.s36za.mongodb.net/?retryWrites=true&w=majority&appName=ismarDB";  //Link for mongoDB database
-const client = new MongoClient(uri); 
+
+
+
 
 
 app.use(express.static(path.join(__dirname, '/public')))
@@ -42,13 +45,16 @@ app.get('/', (req, res) =>{
 
 
 app.post('/newpost', (req, res) => {
+
+  let data = "users";
+  const myobj = { Username: req.body.name, Password: req.body.pw, Email: req.body.email };
   
+
     console.log('Redirectam');
-    console.log(req.cookies); 
-    
-  
+    pageWrite(data, myobj , res);
+    console.log('koookie');
    
-    res.cookie('rememberme', '1', { expires: new Date(Date.now() + 36000000), httpOnly: true, sameSite: 'None', secure: 'false'})
+    res.cookie('rememberme', '1', { expires: new Date(Date.now() + 36000000),  sameSite: 'None', secure: 'false'});
 
     res.redirect('/redirect');
 
@@ -61,6 +67,7 @@ app.post('/newpost', (req, res) => {
   app.get('/redirect', (req, res) =>{
    
      res.sendFile(path.join(__dirname, 'public', 'red.html'));
+
     
   })
 
@@ -81,21 +88,8 @@ app.post('/newpost', (req, res) => {
 
 
 
-  //Writing to base
-  async function pageWrite(pageColl, obj) {
-   
-    try {
-      // Connect to the MongoDB server
-      await client.connect();
-      console.log("Connected successfully to server");
-      const db = client.db("page");
-      const result = await db.collection(pageColl).insertOne(obj);
-      console.log("1 document inserted", result);
-      } catch (err) {
-      console.error("An error occurred:", err);
-    } finally {
-         await client.close();
-    }
-  }
+  app.get('/servererror', (req, res) =>{
+    res.sendFile(path.join(__dirname, 'public', 'error.html'));
+ })
   
   
