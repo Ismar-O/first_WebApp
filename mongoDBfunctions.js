@@ -1,5 +1,6 @@
 //Pisanje po bazi
-    const uri = "mongodb+srv://ismarosmanovic04:hCprY70OQEnq3yod@ismardb.s36za.mongodb.net/?retryWrites=true&w=majority&appName=ismarDB";     
+    require('dotenv').config();
+    const uri = process.env.MONGODB_URI;     
     const { MongoClient } = require("mongodb"); 
     const mongoDB = new MongoClient(uri); 
     const mongoDBcoll = 'page';
@@ -25,7 +26,7 @@
     }
   }
 
-  async function pageRead(pageDoc, query){
+  async function pageReadOne(pageDoc, query){
     try {
       await client.connect();
       const database = client.db(mongoDBcoll);
@@ -45,4 +46,4 @@
 
 
 
-  module.exports =  {pageWrite, pageRead};
+  module.exports =  {pageWrite, pageReadOne};

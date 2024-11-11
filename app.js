@@ -8,7 +8,7 @@ const path = require('path');
 app.set('view engine', 'pug');
 
 const routers = require('./routers');    //ubacivanje ruta iz routes.js
-const {pageWrite, pageRead} = require('./mongoDBfunctions'); //ubacivanje funkcija za pisanje po bazi iz mongoDBfunctions
+const {pageWrite, pageReadOne} = require('./mongoDBfunctions'); //ubacivanje funkcija za pisanje po bazi iz mongoDBfunctions
 app.use('/redirect', routers);
 
 

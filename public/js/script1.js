@@ -24,11 +24,12 @@ function animateElement() {
 
 document.getElementById('novaFoo').addEventListener('click',async function(foo) {
 
+  foo.preventDefault();
   let data = {
     dataOdKlijenta1: 'primjer 1',
     dataOdKlijenta2: 'primjer 2',
   };
-  foo.preventDefault();
+
   const response = await fetch('/redirect', {
     method: 'POST',
     headers: {
