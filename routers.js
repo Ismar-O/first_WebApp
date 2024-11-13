@@ -7,11 +7,9 @@ router.use(express.json());
 
 router.all('*', (req,res, next)=>{
 
-    console.log('za sve');
     next();
   
   })
-
 
   
 

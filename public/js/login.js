@@ -4,13 +4,12 @@ document.getElementById('myForm').addEventListener('submit', async function(e) {
     const formData = new FormData(this);
     
     const data = {
-      name: formData.get('name'),
+      username: formData.get('name'),
       pw: formData.get('pw'),
-      email: formData.get('email')
      };
 
     try {
-      const response = await fetch('/newpost', {
+      const response = await fetch('/login/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,6 +28,3 @@ document.getElementById('myForm').addEventListener('submit', async function(e) {
       console.error('Error:', error);
     }
   });
-
-
-  

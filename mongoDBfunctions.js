@@ -3,10 +3,7 @@
     const uri = process.env.MONGODB_URI;     
     const { MongoClient } = require("mongodb"); 
     const mongoDB = new MongoClient(uri); 
-    const mongoDBcoll = 'page';
-
-
-
+    const myMongoDB = 'page';
 
   async function pageWrite(pageColl, obj, res) {
    
@@ -25,25 +22,21 @@
          await mongoDB.close();
     }
   }
-
-  async function pageReadOne(pageDoc, query){
+// Funkciji pageRead se prosljedjuje mongodb kolekcija i query
+// Vraca cijeli dokument koji odgovara query-u
+  async function pageRead(coll, query){
     try {
-      await client.connect();
-      const database = client.db(mongoDBcoll);
-      const pageUsers = database.collection(pageDoc);
-      const pageUserName = await pageUsers.findOne(query);
-
-      if(pageUserName == null){
-        return null;
-      }else{
-        return pageUserName.Password
-      }
+      await mongoDB.connect();
+      const database = mongoDB.db(myMongoDB);
+      const mongoColl = database.collection(coll);
+      const DBdoc = await mongoColl.findOne(query);
+      return DBdoc;
     } finally {     
-      await client.close();
+      await mongoDB.close();
     }
 
 }
 
 
 
-  module.exports =  {pageWrite, pageReadOne};
+  module.exports =  {pageWrite, pageRead};
