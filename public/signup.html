@@ -6,14 +6,23 @@
     <title>Document</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-    <form id="myForm">
-        <input type="submit">
+<body class="login-signup-class">
+    <h1>Signup</h1>
+    <div id="myForm">
+    <form id="formData">
+        
         <input type="text" name="name" placeholder="Name">
-        <input type="text" name="pw" placeholder="Pass">
-        <input type="text" name="email" placeholder="email">
+        <input type="text" name="pw" placeholder="Pass" autocomplete="off">
+        <input type="text" name="email" placeholder="Email">
+        <input type="submit" value="Signup">
+        <div>
+            Have an account? <br>
+            Login:
+            <input type="button" id="btn-login" value="Login">
+        </div>
     </form>
-    <input type="button" id="btn-login" value="LOGIN">
+    
+    </div>
 
 <script src="/js/signup.js"></script>
 </body>

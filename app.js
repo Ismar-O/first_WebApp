@@ -28,6 +28,19 @@ app.use(session({
 
 /****************************************** */
 
+/****************************************** Password hashing */
+
+const bcrypt = require('bcrypt');
+
+async function hashPassword(plainPassword) {
+  const saltRounds = 10;           // Defines the cost factor; 10 is a reasonable default
+  const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+  return hashedPassword;
+}
+
+
+/***************************************** */
+
 app.use(express.json());
 
 
@@ -44,7 +57,8 @@ app.use(express.static(path.join(__dirname, '/public/images')));
 
 
 app.all('*', (req,res, next)=>{
-  const allowedPaths = ['/login', '/login/send', '/signup', '/signup/send']; // Add more exceptions as needed
+
+  const allowedPaths = ['/', '/login', '/login/send', '/signup', '/signup/send']; // Add more exceptions as needed
   if (!req.session.userId && !allowedPaths.includes(req.originalUrl)) {
     res.redirect('/login');
   }else{
@@ -52,7 +66,12 @@ app.all('*', (req,res, next)=>{
   }
 })
 
+app.post('', (req, res) =>{
+  console.log('default')
+})
+
 app.get('/', (req, res) =>{
+  console.log('default')
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 })
 
@@ -67,13 +86,13 @@ app.get('/login', (req, res) =>{
 
 app.post('/login/send', (req, res) => {
   const user ={
-   pw: req.body.pw,
-   username: req.body.username
+   Password: req.body.pw,
+   Username: req.body.username
   }
   console.log('login');
   
   if(loginUser(user)){
-    req.session.userId = user.username;  
+    req.session.userId = user.Username;  
     console.log('login')
     res.redirect('/redirect');
   }
@@ -82,13 +101,14 @@ app.post('/login/send', (req, res) => {
   }
 })
 
+
+/**Funkcija uzime dokument user sa frontenda i na onovu njegove unesene sifre i username-a projerava sifru*/
 async function loginUser(user){
-  pass = user.pw;
-  pageRead('users',{Username: user.username}).then(DBpass =>{
-    console.log('ismaaar')
-    DBpass = DBpass.Password;
-   
-    console.log('unesena sifra ' + pass + ' --- sifra baze' + DBpass);  
+  pass = user.Password;
+  username = user.Username
+  pageRead('users',{Username: username}).then(DBdoc =>{
+    DBpass = DBdoc.Password;
+    console.log(DBdoc);
     if(pass == DBpass){
       return true;
     }else{
@@ -105,10 +125,14 @@ app.post('/signup/send', (req,res) =>{
     Username: req.body.username,
     Email: req.body.email
    }
-   console.log('signup');
+
+   hashPassword(user.Password).then(hashedPassword => {
+    console.log('Hashed Password:', hashedPassword);
+    user.Password = hashedPassword;
+    console.log('signup');
    pageWrite('users', user, res).then(result=>{
     if(loginUser(user)){
-      req.session.userId = user.username;  
+      req.session.userId = user.Username;  
       console.log('login')
       res.redirect('/redirect');
     }
@@ -117,10 +141,13 @@ app.post('/signup/send', (req,res) =>{
     }
 
    });
+  });
+
+   
    
 
 });
-
+/*
 app.post('/newpost', (req, res) => {
 
   let data = "users";
@@ -151,7 +178,7 @@ app.post('/newpost', (req, res) => {
     
   });
 
-
+*/
   app.get('/redirect', (req, res) =>{
 
 

@@ -1,7 +1,13 @@
-document.getElementById('myForm').addEventListener('submit', async function(e) {
+document.getElementById('formData').addEventListener('submit', async function(e) {
     e.preventDefault();  // Prevent default form submission
     const formData = new FormData(this);
     console.log('submit');
+
+    if(formData.get('name') == '' || formData.get('pw')=='' || formData.get('email')==''){
+      console.error('Empty fields!!');
+      document.getElementById('formData').style.backgroundColor = 'rgb(255, 60, 60)';
+      return;
+}
     
     const data = {
       username: formData.get('name'),

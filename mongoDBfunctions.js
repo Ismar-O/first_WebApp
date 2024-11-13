@@ -26,6 +26,8 @@
 // Vraca cijeli dokument koji odgovara query-u
   async function pageRead(coll, query){
     try {
+
+      console.log(coll + ' ---- '+ query)
       await mongoDB.connect();
       const database = mongoDB.db(myMongoDB);
       const mongoColl = database.collection(coll);
