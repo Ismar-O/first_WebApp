@@ -29,7 +29,11 @@ document.getElementById('formData').addEventListener('submit', async function(e)
         window.location.href = response.url; // Redirect to the URL specified in the response
       }
         const result = await response.json();
-      
+        if(result!=null){
+          alert(result.alert);
+        }
+        
+              
     } catch (error) {
       console.error('Error:', error);
     }
@@ -41,30 +45,6 @@ document.getElementById('formData').addEventListener('submit', async function(e)
   });
   
   
-  /* Dio GET FETCH ne radi zbog status koda koji vraca, 200 umjesto redirect 300
-
-  document.getElementById('btn-login').addEventListener('click', async function(e) {
-      try {
-      const response = await fetch('/login', {
-        method: 'GET',
-        redirect: 'follow'
-      })
-      
-      if (response.redirected) {
-        console.log('redirected');
-        window.location.href = response.url; // Redirect to the URL specified in the response
-      }
-        //const result = await response.json();
-       
-        console.log('nakon');
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  });
-
-
- 
-  */
-
+  
 
   

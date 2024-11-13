@@ -27,12 +27,12 @@
   async function pageRead(coll, query){
     try {
 
-      console.log(coll + ' ---- '+ query)
+      console.log('MONGODB READ -- ' + coll + ' ---- '+ query)
       await mongoDB.connect();
       const database = mongoDB.db(myMongoDB);
       const mongoColl = database.collection(coll);
       const DBdoc = await mongoColl.findOne(query);
-      console.log(DBdoc);
+      console.log('MONGODB document' + DBdoc);
       return DBdoc;
     } finally {     
       await mongoDB.close();

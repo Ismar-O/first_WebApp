@@ -31,8 +31,9 @@ document.getElementById('formData').addEventListener('submit', async function(e)
          window.location.href = response.url; // Redirect to the URL specified in the response
       }
         const result = await response.json();
-        console.log(result);
-        //console.log('Response:', result);
+        if(result!=null){
+          alert(result.alert);
+        }
     } catch (error) {
       console.error('Error:', error);
     }

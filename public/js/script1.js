@@ -18,7 +18,9 @@ function animateElement() {
   
   // Call the function to start the animation
   animateElement();
-  console.log('redi')
+  document.getElementById('btn-novi').addEventListener('click', () => {
+    window.location.href = '/novi'; 
+  });
 
 
 

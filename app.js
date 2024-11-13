@@ -7,9 +7,9 @@ const path = require('path');
 
 app.set('view engine', 'pug');
 
-const routers = require('./routers');    //ubacivanje ruta iz routes.js
+const feedRouters = require('./feedRouters');    //ubacivanje ruta iz routes.js
 const {pageWrite, pageRead} = require('./mongoDBfunctions'); //ubacivanje funkcija za pisanje po bazi iz mongoDBfunctions
-app.use('/redirect', routers);
+app.use('/feed', feedRouters);
 
 /******************************************** Sesije */
 
@@ -18,7 +18,7 @@ const session = require('express-session');
 app.use(session({
   secret: 'securekey123456',  // Replace with a secure key
   resave: false,              // Prevents resaving session if nothing has changed
-  saveUninitialized: false,    // Saves uninitialized sessions
+  saveUninitialized: false,   // Saves uninitialized sessions
   cookie: { 
     httpOnly: true,           // Prevents JavaScript access to cookies
     secure: false,            // Set to true in production with HTTPS
@@ -26,16 +26,19 @@ app.use(session({
   }
 }));
 
-/****************************************** */
-
 /****************************************** Password hashing */
 
 const bcrypt = require('bcrypt');
 
 async function hashPassword(plainPassword) {
-  const saltRounds = 10;           // Defines the cost factor; 10 is a reasonable default
+  const saltRounds = 10;           
   const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
   return hashedPassword;
+}
+
+async function comparePasswords(plainPassword, hashedPassword) {
+  const match = await bcrypt.compare(plainPassword, hashedPassword);
+  return match; 
 }
 
 
@@ -58,14 +61,14 @@ app.use(express.static(path.join(__dirname, '/public/images')));
 
 app.all('*', (req,res, next)=>{
 
-  const allowedPaths = ['/', '/login', '/login/send', '/signup', '/signup/send']; // Add more exceptions as needed
+  const allowedPaths = ['/', '/login', '/login/send', '/signup', '/signup/send', '/servererror']; // Add more exceptions as needed
   if (!req.session.userId && !allowedPaths.includes(req.originalUrl)) {
     res.redirect('/login');
   }else{
      next();
   }
 })
-
+/***************************** GET Redirects ************************/
 app.post('', (req, res) =>{
   console.log('default')
 })
@@ -83,70 +86,103 @@ app.get('/login', (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 })
 
+app.get('/feed', (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'red.html'));
+})
 
+/*******************************  LOGIN ******************************/
 app.post('/login/send', (req, res) => {
   const user ={
    Password: req.body.pw,
    Username: req.body.username
   }
-  console.log('login');
-  
-  if(loginUser(user)){
-    req.session.userId = user.Username;  
-    console.log('login')
-    res.redirect('/redirect');
-  }
-  else{
-    res.redirect('/servererror');
-  }
+    loginUser(user).then(result =>{
+      if(result){
+        req.session.userId = user.Username;  
+        console.log('Login SUCESSFULL');
+        res.redirect('/feed');
+      }
+      else{
+        console.log('Login NOT successfull, ERROR');
+        res.send(JSON.stringify({alert: 'Wrong Password'}));
+      }
+  });
 })
 
 
-/**Funkcija uzime dokument user sa frontenda i na onovu njegove unesene sifre i username-a projerava sifru*/
-async function loginUser(user){
-  pass = user.Password;
-  username = user.Username
-  pageRead('users',{Username: username}).then(DBdoc =>{
-    DBpass = DBdoc.Password;
-    console.log(DBdoc);
-    if(pass == DBpass){
-      return true;
-    }else{
-      return false;
-    }
-  }).catch(error => {
-    console.error(error);
-});
-}
 
-app.post('/signup/send', (req,res) =>{
+app.post('/signup/send', async (req,res) =>{
   const user ={
     Password: req.body.pw,
     Username: req.body.username,
     Email: req.body.email
    }
-
-   hashPassword(user.Password).then(hashedPassword => {
+   const sameUserName = await checkSameUsername(user);
+   if(!sameUserName){
+    const alert = {
+      alert: 'Username not avaliable'
+    }
+       res.send(JSON.stringify(alert));
+    return
+   }
+   const hashedPassword = await hashPassword(user.Password)
+   
     console.log('Hashed Password:', hashedPassword);
     user.Password = hashedPassword;
     console.log('signup');
-   pageWrite('users', user, res).then(result=>{
+    await pageWrite('users', user, res);
     if(loginUser(user)){
       req.session.userId = user.Username;  
       console.log('login')
-      res.redirect('/redirect');
+      res.redirect('/feed');
     }
     else{
       res.redirect('/login');
     }
-
-   });
-  });
-
-   
-   
-
 });
+
+/**Funkcija uzime dokument user sa frontenda i na onovu njegove unesene sifre i username-a projerava sifru*/
+async function loginUser(user){
+  pass = user.Password;
+  username = user.Username
+  try {
+    const DBdoc = await pageRead('users', { Username: username }); 
+    if (DBdoc == null) {
+      console.log('loginUser function -- Empty document');
+      return false; 
+    }
+    const DBpass = DBdoc.Password;
+    const truePass = await comparePasswords(pass, DBpass)
+    if (truePass) {  
+      console.log('loginUser function -- CORRECT pass');
+      return true; 
+    } else {
+      return false; 
+    }
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+async function checkSameUsername(user){
+  username = user.Username
+  try {
+    const DBdoc = await pageRead('users', { Username: username }); 
+    if (DBdoc == null) {
+      //console.log('checkSameUsername function -- Unique username');
+      return true; 
+    }else{
+      //console.log('checkSameUsername function -- NOT Unique username');
+      return false;
+    }
+
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
 /*
 app.post('/newpost', (req, res) => {
 
@@ -179,13 +215,7 @@ app.post('/newpost', (req, res) => {
   });
 
 */
-  app.get('/redirect', (req, res) =>{
 
-
-     res.sendFile(path.join(__dirname, 'public', 'red.html'));
-
-    
-  })
 
   app.post('/redirect', (req,res)=>{
     res.redirect('/getred');
