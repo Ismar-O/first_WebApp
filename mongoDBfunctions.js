@@ -11,7 +11,7 @@
       console.log('Conecting to DB...')
       await mongoDB.connect();
       console.log("Connected successfully to DB");
-      const db = mongoDB.db(mongoDBcoll);
+      const db = mongoDB.db(myMongoDB);
       const result = await db.collection(pageColl).insertOne(obj);
       console.log("1 document inserted", result);
       
@@ -30,6 +30,7 @@
       const database = mongoDB.db(myMongoDB);
       const mongoColl = database.collection(coll);
       const DBdoc = await mongoColl.findOne(query);
+      console.log(DBdoc);
       return DBdoc;
     } finally {     
       await mongoDB.close();

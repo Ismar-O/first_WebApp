@@ -31,7 +31,6 @@ app.use(session({
 app.use(express.json());
 
 
-
 const port = 8000;   
 // Starting server
 app.listen(port, '0.0.0.0', () => {
@@ -39,19 +38,13 @@ app.listen(port, '0.0.0.0', () => {
 });
 
 
-
-
-
-
 app.use(express.static(path.join(__dirname, '/public')))
-//app.use(express.static(path.join(__dirname, '/public/js'))); Nije potrebno 
-//app.use(express.static(path.join(__dirname, '/public/css')));
 app.use(express.static(path.join(__dirname, '/public/images')));
 
 
 
 app.all('*', (req,res, next)=>{
-  const allowedPaths = ['/login', '/login/send']; // Add more exceptions as needed
+  const allowedPaths = ['/login', '/login/send', '/signup', '/signup/send']; // Add more exceptions as needed
   if (!req.session.userId && !allowedPaths.includes(req.originalUrl)) {
     res.redirect('/login');
   }else{
@@ -63,8 +56,8 @@ app.get('/', (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 })
 
-app.get('/newpost', (req, res) =>{
-  res.sendFile(path.join(__dirname, 'public', 'newpost.html'));
+app.get('/signup', (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'signup.html'));
 })
 
 app.get('/login', (req, res) =>{
@@ -78,7 +71,7 @@ app.post('/login/send', (req, res) => {
    username: req.body.username
   }
   console.log('login');
-
+  
   if(loginUser(user)){
     req.session.userId = user.username;  
     console.log('login')
@@ -87,14 +80,15 @@ app.post('/login/send', (req, res) => {
   else{
     res.redirect('/servererror');
   }
-
-
 })
 
 async function loginUser(user){
   pass = user.pw;
   pageRead('users',{Username: user.username}).then(DBpass =>{
+    console.log('ismaaar')
     DBpass = DBpass.Password;
+   
+    console.log('unesena sifra ' + pass + ' --- sifra baze' + DBpass);  
     if(pass == DBpass){
       return true;
     }else{
@@ -103,8 +97,29 @@ async function loginUser(user){
   }).catch(error => {
     console.error(error);
 });
- 
 }
+
+app.post('/signup/send', (req,res) =>{
+  const user ={
+    Password: req.body.pw,
+    Username: req.body.username,
+    Email: req.body.email
+   }
+   console.log('signup');
+   pageWrite('users', user, res).then(result=>{
+    if(loginUser(user)){
+      req.session.userId = user.username;  
+      console.log('login')
+      res.redirect('/redirect');
+    }
+    else{
+      res.redirect('/login');
+    }
+
+   });
+   
+
+});
 
 app.post('/newpost', (req, res) => {
 
